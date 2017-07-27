@@ -17,7 +17,7 @@ Adafruit_DCMotor *motor4 = AFMS.getMotor(4);
  
 // You should get Auth Token in the Blynk App.
 // Go to the Project Settings (nut icon).
-char auth[] = "51638ee72eda4e9c89012e71ee42385d";
+char auth[] = "";
  
 //Servos for arm
 Servo servo1;  //bottom servo
