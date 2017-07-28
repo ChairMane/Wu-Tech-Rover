@@ -1,4 +1,4 @@
-#define BLYNK_PRINT Serial
+//#define BLYNK_PRINT Serial
  
 #include <ESP8266_Lib.h>
 #include <SimpleTimer.h>
@@ -17,7 +17,7 @@ Adafruit_DCMotor *motor4 = AFMS.getMotor(4);
  
 // You should get Auth Token in the Blynk App.
 // Go to the Project Settings (nut icon).
-char auth[] = "";
+char auth[] = "YOUR AUTH TOKEN";
  
 //Servos for arm
 Servo servo1;  //bottom servo
@@ -34,9 +34,10 @@ SimpleTimer timer;
  
 // Your WiFi credentials.
 // Set password to "" for open networks.
-char ssid[] = "";
-char pass[] = "";
- 
+char ssid[] = "SSID";
+char pass[] = "PASSWORD";
+
+void moveArmServo(Servo, int);
 void moveRover(Adafruit_DCMotor*, Adafruit_DCMotor*, int);
  
 // Hardware Serial on Mega, Leonardo, Micro...
@@ -66,42 +67,26 @@ BLYNK_WRITE(V1) {                         //
 
  
 BLYNK_WRITE(V2) {                         // Slider for bottom rotation servo
- 
     int potentio = param.asInt();
-    //Serial.println(potentio);
-    potentio = map(potentio, 0, 1023, 0, 179);
-    servo1.write(potentio);    
-    delay(15);
+    moveArmServo(servo1, potentio);
 }
 
  
 BLYNK_WRITE(V3) {                         // Slider for shoulder servo
- 
     int potentio = param.asInt();
-    //Serial.println(potentio);
-    potentio = map(potentio, 0, 1023, 0, 179);
-    servo2.write(potentio);    
-    delay(15);
+    moveArmServo(servo2, potentio);
 }
 
  
 BLYNK_WRITE(V4) {                         // Slider for elbow servo
- 
     int potentio = param.asInt();
-    //Serial.println(potentio);
-    potentio = map(potentio, 0, 1023, 0, 179);
-    servo3.write(potentio);    
-    delay(15);
+    moveArmServo(servo3, potentio);
 }
 
  
 BLYNK_WRITE(V5) {                         // Slider for wrist servo
- 
     int potentio = param.asInt();
-    //Serial.println(potentio);
-    potentio = map(potentio, 0, 1023, 0, 179);
-    servo4.write(potentio);    
-    delay(15);
+    moveArmServo(servo4, potentio);
 }
 
 
@@ -145,6 +130,12 @@ void sendUptime() {
  
 void loop() {
     Blynk.run();
+}
+
+void moveArmServo(Servo servo, int potentiometer){
+    potentiometer = map(potentiometer, 0, 1023, 0, 269);
+    servo.write(potentiometer);    
+    delay(15);
 }
  
  
