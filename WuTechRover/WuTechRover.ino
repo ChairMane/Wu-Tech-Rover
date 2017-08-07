@@ -1,3 +1,4 @@
+//Uncomment line below to show debug message
 //#define BLYNK_PRINT Serial
  
 #include <ESP8266_Lib.h>
@@ -6,7 +7,6 @@
 #include <Wire.h>
 #include <Servo.h>
 #include <Adafruit_MotorShield.h>
-#include "utility/Adafruit_MS_PWMServoDriver.h"
  
  
 // You should get Auth Token in the Blynk App under the nut icon in the project settings
@@ -50,61 +50,6 @@ void moveRover(Adafruit_DCMotor*, Adafruit_DCMotor*, int);
 
  
 ESP8266 wifi(&EspSerial);
-
-
-//Left joystick, for control of the left pair of wheels (motors 2 and 4)
-BLYNK_WRITE(V0) {
-    int x = param[0].asInt();
-    int y = param[1].asInt();
-    moveRover(motor2, motor4, y);
-}
-
-
-//Right joystick, for control of the left pair of wheels (motors 1 and 3)
-BLYNK_WRITE(V1) {
-    int x = param[0].asInt();
-    int y = param[1].asInt();
-    moveRover(motor1, motor3, y);
-}
-
-
-
-BLYNK_WRITE(V2) {                         
-    int potentio = param.asInt();
-    moveArmServo(servo1, potentio);
-}
-
-
- 
-BLYNK_WRITE(V3) {
-    int potentio = param.asInt();
-    moveArmServo(servo2, potentio);
-}
-
-
- 
-BLYNK_WRITE(V4) {
-    int potentio = param.asInt();
-    moveArmServo(servo3, potentio);
-}
-
-
- 
-BLYNK_WRITE(V5) {
-    int potentio = param.asInt();
-    moveArmServo(servo4, potentio);
-}
-
-
-
-BLYNK_WRITE(V6) {
-    int buttonState = param.asInt();
-    if (buttonState == 1) {
-        seedBoxServo.write(80);
-    } else {
-        seedBoxServo.write(0);
-    }
-}
  
  
 void setup() {
@@ -123,6 +68,11 @@ void setup() {
 
     //Sets initial angle of seed box servo
     seedBoxServo.write(0);
+
+    servo1.write(145);
+    servo2.write(0);
+    servo3.write(50);
+    servo4.write(90);
     
  
     //Sets ESP8266 baud rate
@@ -133,23 +83,66 @@ void setup() {
     Blynk.begin(auth, wifi, ssid, pass);
 }
 
- 
-void sendUptime() {
-    //Shows the value temp on virtual pin 10
-    Blynk.virtualWrite(10, temp);
+//Left joystick, for control of the left pair of wheels (motors 2 and 4)
+BLYNK_WRITE(V0) {
+    int x = param[0].asInt();
+    int y = param[1].asInt();
+    moveRover(motor2, motor4, y);
 }
 
+
+//Right joystick, for control of the left pair of wheels (motors 1 and 3)
+BLYNK_WRITE(V1) {
+    int x = param[0].asInt();
+    int y = param[1].asInt();
+    moveRover(motor1, motor3, y);
+}
+
+
+//Horizontal slider controls the base servo that rotates horizontally
+BLYNK_WRITE(V2) {                         
+    int potentio = param.asInt();
+    moveArmServo(servo1, potentio);
+}
+
+//Vertcial slider controls the shoulder servo that rotates vertically 
+BLYNK_WRITE(V3) {
+    int potentio = param.asInt();
+    moveArmServo(servo2, potentio);
+}
+
+
+//Vorizontal slider controls the elbow servo that rotates vertically
+BLYNK_WRITE(V4) {
+    int potentio = param.asInt();
+    moveArmServo(servo3, potentio);
+}
+
+
+//Horizontal slider controls the excavator bucket that rotates vertically 
+BLYNK_WRITE(V5) {
+    int potentio = param.asInt();
+    moveArmServo(servo4, potentio);
+}
+
+//Button controls servo that opens door for seed box
+BLYNK_WRITE(V6) {
+    int buttonState = param.asInt();
+    if (buttonState == 1) {
+        seedBoxServo.write(80);
+    } else {
+        seedBoxServo.write(0);
+    }
+}
  
 void loop() {
     Blynk.run();
 }
 
 void moveArmServo(Servo servo, int potentiometer){
-    potentiometer = map(potentiometer, 0, 1023, 0, 269);
     servo.write(potentiometer);    
     delay(15);
 }
- 
  
 void moveRover(Adafruit_DCMotor *motor_a, Adafruit_DCMotor *motor_b, int y_speed) {
     if (y_speed == 128){
